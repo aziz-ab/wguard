@@ -97,7 +97,7 @@ function installWireGuard() {
 
 	# Install WireGuard tools and module
 	apt-get update
-	apt-get install -y qrencode nano
+	apt-get install -y qrencode nano wireguard
 
 	# Make sure the directory exists (this does not seem the be the case on fedora)
 	mkdir /etc/wireguard >/dev/null 2>&1
