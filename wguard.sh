@@ -80,6 +80,7 @@ function installQuestions() {
     read -rp "Server's WireGuard port: " -e -i "${SERVER_PORT}" SERVER_PORT
 
     SERVER_MTU = "1420"
+	read -rp "Server's MTU: " -e -i "${SERVER_MTU}" SERVER_MTU
 
 	# Adguard DNS by default
 	read -rp "First DNS resolver to use for the clients: " -e -i 1.1.1.1 CLIENT_DNS_1
