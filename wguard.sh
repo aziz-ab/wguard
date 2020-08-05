@@ -58,7 +58,7 @@ function initialCheck() {
 	checkOS
 }
 
-function installQuestions() {
+function preInstall() {
 	echo "Welcome to the WireGuard installer!"
 	echo "I need to ask you a few questions before starting the setup."
 	echo ""
@@ -80,7 +80,6 @@ function installQuestions() {
     read -rp "Server's WireGuard port: " -e -i "${SERVER_PORT}" SERVER_PORT
 
     SERVER_MTU="1420"
-	read -rp "Server's MTU: " -e -i "${SERVER_MTU}" SERVER_MTU
 
 	# Adguard DNS by default
 	read -rp "First DNS resolver to use for the clients: " -e -i 1.1.1.1 CLIENT_DNS_1
@@ -89,12 +88,13 @@ function installQuestions() {
 
 	echo ""
 	echo "Okay, that was all I needed. We are ready to setup your WireGuard server now."
+	echo ""
 	read -n1 -r -p "Press any key to continue..."
 }
 
 function installWireGuard() {
 	# Run setup questions first
-	installQuestions
+	preInstall
 
 	# Install WireGuard tools and module
 	apt-get update
@@ -150,7 +150,9 @@ PostDown = iptables -D FORWARD -i ${SERVER_WG_NIC} -j ACCEPT; iptables -t nat -D
 	fi
 
 	# newClient
-	# echo "If you want to add more clients, you simply need to run this script another time!"
+	echo "If you want to add more clients, you simply need to run this script another time!"
+	echo ""
+	listMenu
 }
 
 function newClient() {
@@ -159,10 +161,11 @@ function newClient() {
     CLIENT_WG_IPV4="10.0.0."
     read -rp "Client's WireGuard IPv4: " -e -i "$CLIENT_WG_IPV4" CLIENT_WG_IPV4
 
-    CLIENT_NAME=$(
-        head /dev/urandom | tr -dc A-Za-z0-9 | head -c 10
-        echo ''
-    )
+    # CLIENT_NAME=$(
+    #    head /dev/urandom | tr -dc A-Za-z0-9 | head -c 10
+    #    echo ''
+    #)
+	CLIENT_NAME="${CLIENT_WG_IPV4}"
 
     # Generate key pair for the client
     CLIENT_PRIV_KEY=$(wg genkey)
@@ -190,7 +193,7 @@ function newClient() {
 
     qrencode -t ansiutf8 <"$HOME/$SERVER_WG_NIC-client-$CLIENT_NAME.conf"
 
-    echo "It is also available in $HOME/$SERVER_WG_NIC-client-$CLIENT_NAME.conf"
+    echo "\nIt is also available at $HOME/$SERVER_WG_NIC-client-$CLIENT_NAME.conf"
 }
 
 function revokeClient() {
@@ -270,10 +273,10 @@ function uninstallWg() {
 	fi
 }
 
-function manageMenu() {
+function listMenu() {
 	echo "What do you want to do?"
-	echo "   1) Add a new user"
-	echo "   2) Revoke existing user"
+	echo "   1) Add a new client"
+	echo "   2) Revoke existing client"
 	echo "   3) Uninstall WireGuard"
 	echo "   4) Exit"
 	until [[ ${MENU_OPTION} =~ ^[1-4]$ ]]; do
@@ -301,7 +304,7 @@ initialCheck
 # Check if WireGuard is already installed and load params
 if [[ -e /etc/wireguard/params ]]; then
 	source /etc/wireguard/params
-	manageMenu
+	listMenu
 else
 	installWireGuard
 fi
