@@ -183,7 +183,8 @@ function newClient() {
     AllowedIPs = 0.0.0.0/0" >>"$HOME/$SERVER_WG_NIC-client-$CLIENT_NAME.conf"
 
     # Add the client as a peer to the server
-    echo -e "\n[Peer]
+    echo -e "\n### Client ${CLIENT_NAME}
+	[Peer]
     PublicKey = $CLIENT_PUB_KEY
     AllowedIPs = $CLIENT_WG_IPV4/32" >>"/etc/wireguard/$SERVER_WG_NIC.conf"
 
@@ -287,7 +288,7 @@ function listMenu() {
 		newClient
 		;;
 	2)
-		# revokeClient
+		revokeClient
 		;;
 	3)
 		# uninstallWg
